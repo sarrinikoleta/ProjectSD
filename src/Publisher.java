@@ -249,13 +249,13 @@ public class Publisher implements Node {
     }
 
 
-    /*  //ActionsForBrokers
+    /*              //ActionsForBrokers
 
 
     private class ActionsForBrokers extends Thread {
-        private Socket requestSocket; //Broker's socket.
+        private Socket requestSocket;   //Broker's socket.
         //Reader/writers and I/O streams.
-        private PrintWriter avalableSongStream;
+        //private PrintWriter avalableSongStream;
         private BufferedReader outS;
         private InputStreamReader inS;
         private ObjectOutputStream out;
@@ -271,15 +271,15 @@ public class Publisher implements Node {
             MusicFile m = null;
             Mp3File s = null;
             try {
-                for(int i=0; i<songs.size(); i++) { //Checking if the requested song exists in the songs list.
-                    if(requestedSong.equalsIgnoreCase(songs.get(i).getId3v1Tag().getTitle()) && requestedArtist.equalsIgnoreCase(songs.get(i).getId3v1Tag().getArtist())){
+                for (int i = 0; i < songs.size(); i++) { //Checking if the requested song exists in the songs list.
+                    if (requestedSong.equalsIgnoreCase(songs.get(i).getId3v1Tag().getTitle()) && requestedArtist.equalsIgnoreCase(songs.get(i).getId3v1Tag().getArtist())) {
                         songFound = true;
                         s = songs.get(i);
                         FileInputStream is = new FileInputStream(filesRead.get(i)); //Reading the mp3 file matching the broker query.
                         byte[] chunk = new byte[512 * 1024]; //Creating the chunk array and setting how many bytes each chunk is.
 
                         int rc = is.read(chunk); //Reading the first chunk of the file.
-                        while(rc != -1) { //This keeps reading and splitting the mp3 file until its completely read.
+                        while (rc != -1) { //This keeps reading and splitting the mp3 file until its completely read.
 
                             //Storing the information of the song in MusicFile and Value objects.
                             m = new MusicFile(s.getId3v1Tag().getTitle(), s.getId3v1Tag().getArtist(), s.getId3v1Tag().getAlbum(), s.getId3v1Tag().getGenreDescription(), chunk);
@@ -296,15 +296,18 @@ public class Publisher implements Node {
                 v = new Value(m);
                 out.writeObject(v); //Sends terminal value.
                 out.flush();
-                if(!songFound) {
+                if (!songFound) {
                     notifyFailure(requestedArtist); //Sending the list of all the available songs the requested artist has to the broker.
                 }
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+
+
         }
 
         public void notifyFailure(String requestedArtist) { //If the requested song does not exist, the Publisher notifies the Broker by sending the current available song list.
+            /*
             String listedSongs = "";
             for(File f: filesRead) {
                 if(f.getParentFile().getName().equalsIgnoreCase(requestedArtist)) { //Creating the listedSongs String.
@@ -312,6 +315,8 @@ public class Publisher implements Node {
                 }
             }
             avalableSongStream.println(listedSongs); //sending songList.
+
+
         }
 
         public void run() {
@@ -322,16 +327,16 @@ public class Publisher implements Node {
                 outS = new BufferedReader(inS);
                 out = new ObjectOutputStream(requestSocket.getOutputStream());
 
-                while(true) { //This while breaks when the broker sends the command quit. (The thread then terminates).
+                while (true) { //This while breaks when the broker sends the command quit. (The thread then terminates).
                     //Broker query
                     String requestedArtist = outS.readLine(); //The requested artist's name is stored in this string.
-                    if(requestedArtist.equalsIgnoreCase("quit")) break;
+                    if (requestedArtist.equalsIgnoreCase("quit")) break;
 
-                    while(true) { //This while breaks when the broker sends the command back.
+                    while (true) { //This while breaks when the broker sends the command back.
                         String requestedSong = outS.readLine(); //The requested songs's name is stored in this string.
-                        if(!requestedSong.equalsIgnoreCase("back")) {
+                        if (!requestedSong.equalsIgnoreCase("back")) {
                             push(requestedArtist, requestedSong); //Pushes the information to the broker. (Read method push for more info).
-                        }else {
+                        } else {
                             break;
                         }
                     }
@@ -351,6 +356,8 @@ public class Publisher implements Node {
             }
         }
 
+    }
+
 
     */
 
@@ -361,7 +368,7 @@ public class Publisher implements Node {
     @Override
     public void updateNodes() {}
 
-    /*
+      /*
     public void addFile(File f) {
         this.filesRead.add(f);
     }
@@ -406,4 +413,8 @@ public class Publisher implements Node {
     public void setPublisherId(int publisherId) {
         this.publisherId = publisherId;
     }
+
+
+
+
 }
