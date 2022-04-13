@@ -4,7 +4,7 @@ import java.net.*;
 
 /*
  * Node is the interface for the classes Publisher, Broker, Consumer.
- * All instances of classes that extend this have access to all the
+ * All instances of the classes that extend Node have access to all the
  * ports/ip that each Publisher/Broker uses.
  */
 

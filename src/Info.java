@@ -5,7 +5,7 @@ import java.util.List;
 /*
  * Info objects are used when initializing the Brokers.
  * This class is used when initializing a Broker
- * to store their ip, port, id and the artists
+ * to store their ip, port, id and the groups
  * that have been assigned to said Broker.
  *
  * It implements Serializable so that each broker can send their info
