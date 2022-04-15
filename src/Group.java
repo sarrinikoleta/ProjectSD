@@ -1,8 +1,8 @@
 import java.io.Serializable;
 
 /*
- * ArtistName objects are used to store an artist's name.
- * Mainly used in the hashing process to find which artist is assigned
+ * Group objects are used to store a Group/Topic.
+ * Mainly used in the hashing process to find which topic is assigned
  * to a certain Broker.
  */
 
@@ -12,7 +12,7 @@ public class Group implements Serializable{
 
     //Class constructor.
 
-    public Group(String artistName) {
+    public Group(String groupName) {
         this.groupName = groupName;
     }
 
