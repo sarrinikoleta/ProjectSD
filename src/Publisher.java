@@ -2,9 +2,12 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.security.MessageDigest;
+import java.math.BigInteger;
 
 //import com.mpatric.mp3agic.ID3v1;
 //import com.mpatric.mp3agic.ID3v1Tag;
@@ -139,10 +142,10 @@ public class Publisher implements Node {
 
 
 
-/*   //   Method    hashTopic
+   //   Method    hashTopic
 
-    public List<ArtistName> hashTopic(List<ArtistName> artistList, int hashKey){ //Returns the topicList for a certain hashKey.
-        List<ArtistName> topic = new ArrayList<>();
+    public List<Group> hashTopic(List<Group> groupList, int hashKey){ //Returns the topicList for a certain hashKey.
+        List<Group> topic = new ArrayList<>();
         int[] ipPort = new int[3];
         String hash;
         MessageDigest md;
@@ -168,11 +171,11 @@ public class Publisher implements Node {
             }
             Arrays.sort(ipPort); //sorting array to find where the hashkey belongs easier.
 
-            for(ArtistName artist:artistList) {//Creating hashKeys for all the artists.
+            for(Group group:groupList) {//Creating hashKeys for all the artists.
                 Boolean f = false; //this will remain false if the artistName(key) > ipPort[](keys)
-                String artistName = artist.getArtistName();
+                String groupName = group.getGroupName();
                 md = MessageDigest.getInstance("MD5");
-                md.update(artistName.getBytes());
+                md.update(groupName.getBytes());
                 byte[] digest = md.digest();
                 BigInteger no = new BigInteger(1, digest);
                 String hashtext = no.toString(16);
@@ -184,7 +187,7 @@ public class Publisher implements Node {
                 for(int hashedIpPort:ipPort) {
                     if(hashCode <= hashedIpPort){
                         if(hashedIpPort == hashKey) {
-                            topic.add(new ArtistName(artistName));
+                            topic.add(new Group(groupName));
                             f = true;
                             break;
                         }else {
@@ -194,7 +197,7 @@ public class Publisher implements Node {
                 }
                 if(!f) { //If the haskey of the artist > highest broker haskey, then assign this artist to the broker if he has the smalles .
                     if(hashKey == ipPort[0] && hashCode > ipPort[ipPort.length-1]) {
-                        topic.add(new ArtistName(artistName));
+                        topic.add(new Group(groupName));
                     }
                 }
 
@@ -206,7 +209,6 @@ public class Publisher implements Node {
         return topic;
     }
 
-*/
 
     @Override
     public void init(int port) throws UnknownHostException, IOException{
@@ -243,8 +245,8 @@ public class Publisher implements Node {
             System.out.println("[PUBLISHER] Waiting for broker connection.");
             Socket client = providerSocket.accept();
             System.out.println("[PUBLISHER] Connected to a broker!");
-            ActionsForBrokers brokerThread = new ActionsForBrokers(client); //Each query creates a new Thread.
-            pool2.execute(brokerThread); //Threadpool executes brokerThread.
+           // ActionsForBrokers brokerThread = new ActionsForBrokers(client); //Each query creates a new Thread.
+           // pool2.execute(brokerThread); //Threadpool executes brokerThread.
         }
     }
 

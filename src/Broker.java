@@ -18,8 +18,9 @@ public class Broker implements Node {
 
     private Info brokerInfo = new Info(); //Contains this broker's information.
     //private ExecutorService pool = Executors.newFixedThreadPool(100); //Broker thread pool.
+
     private ServerSocket providerSocket; //Broker's server socket, this accepts Consumer queries.
-    private int[] ipPort; //Hashed ip+Port of all the brokers.
+    private int[] ipPort;               //Hashed ip+Port of all the brokers.
     private int brokerId;
 
     //Broker as a client for publisher
@@ -224,6 +225,11 @@ public class Broker implements Node {
     public List<Publisher> getRegisteredPublisher() {
         return registeredPublisher;
     }
+
+
+
+    //δημιουργεί ένα πίνακα hashedKeys[3] που έχει το hashkey κάθε broker
+    //το χρησιμοποιεί στον Publisher
 
     public void calculateKeys() {               //Setting the hashkeys(ip+port) of all the brokers.
         int[] hashedKeys = new int[3];
