@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import java.security.MessageDigest;
 import java.math.BigInteger;
 
+// ΘΑ ΠΡΕΠΕΙ ΝΑ ΤΑ ΑΝΤΙΚΑΤΑΣΤΗΣΟΥΜΕ ΜΕ ΤΟ PACKAGE https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html
 //import com.mpatric.mp3agic.ID3v1;
 //import com.mpatric.mp3agic.ID3v1Tag;
 //import com.mpatric.mp3agic.InvalidDataException;
@@ -16,7 +17,7 @@ import java.math.BigInteger;
 //import com.mpatric.mp3agic.UnsupportedTagException;
 
 /*
- * Publisher is the main server, each one of the three stores the information of 5 (in this case) artists.
+ * Publisher is the main server, each one of the three stores the information of 5 (in this case) groups/topics.
  */
 
 public class Publisher implements Node {
@@ -49,7 +50,7 @@ public class Publisher implements Node {
         int port;
         reader.close();
 
-        //The publisher's port depend's on how many artists have already been read by the previous Publishers (if any).
+        //The publisher's port depends on how many artists have already been read by the previous Publishers (if any).
 
         //Ανάλογα τί αριθμό έχω μέσα στο αρχείο initPublisher
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./src/initPublisher.txt"))); //This writer is going to be used to update the initPublisher.txt file.
@@ -195,7 +196,7 @@ public class Publisher implements Node {
                         }
                     }
                 }
-                if(!f) { //If the haskey of the artist > highest broker haskey, then assign this artist to the broker if he has the smalles .
+                if(!f) { //If the hashkey of the artist > highest broker haskey, then assign this artist to the broker if he has the smallest.
                     if(hashKey == ipPort[0] && hashCode > ipPort[ipPort.length-1]) {
                         topic.add(new Group(groupName));
                     }

@@ -43,7 +43,7 @@ public class Consumer implements Node {
         System.out.println("Bye!");
     }
 
-    public void init(int port){
+    public void init(int port) {
         try {
             Boolean groupFound;
             initializeQuery.println("Initialize broker list.");
@@ -51,18 +51,18 @@ public class Consumer implements Node {
 
             Info info = (Info) inB.readObject();//getting broker's info
 
-            while(!info.getIp().equalsIgnoreCase("")) {
+            while (!info.getIp().equalsIgnoreCase("")) {
                 getBrokerInfo().add(info);
                 info = (Info) inB.readObject();
             }
             System.out.println("Available chats/topics to enter: ");  //printing groups/topics for which a broker is responsible
-            for(Info i:getBrokerInfo()) {
-                for(Group topic:i.getExistingGroups()) {
+            for (Info i : getBrokerInfo()) {
+                for (Group topic : i.getExistingGroups()) {
                     System.out.println(topic.getGroupName());
                 }
             }
 
-            while(true) {
+            while (true) {
                 groupFound = false; //This is set to true if the group/topic from the query exists
                 System.out.println("Type the name of an available group (type 'quit' to disconnect): ");
                 String topic = keyboard.readLine().trim();
@@ -73,11 +73,11 @@ public class Consumer implements Node {
                     break;
                 }
 
-                for(Info i:getBrokerInfo()) { //accessing the info (ip,port,id) of the broker
-                    for(Group existingGroups:i.getExistingGroups()) {  //accessing the existing groups/topics of the broker
-                        if(topic.equalsIgnoreCase(existingGroups.getGroupName())) { //if the topic the user entered belongs to one of the existing ones
+                for (Info i : getBrokerInfo()) { //accessing the info (ip,port,id) of the broker
+                    for (Group existingGroups : i.getExistingGroups()) {  //accessing the existing groups/topics of the broker
+                        if (topic.equalsIgnoreCase(existingGroups.getGroupName())) { //if the topic the user entered belongs to one of the existing ones
                             groupFound = true; //the group is found
-                            if(!(requestSocket.getPort() == Integer.parseInt(i.getPort()))){ //if consumer isn't already connected to the correct broker
+                            if (!(requestSocket.getPort() == Integer.parseInt(i.getPort()))) { //if consumer isn't already connected to the correct broker
                                 initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
                                 disconnect();
                                 connect(Integer.parseInt(i.getPort())); //connecting to a new broker
@@ -89,28 +89,27 @@ public class Consumer implements Node {
                 }
 
                 // ------- FINDING MEDIA FILE --------
-                List<Path> match;
-                if(groupFound) {
+                /*List<Path> match;
+                if (groupFound) {
                     System.out.println("Type the text you want to send. \nIf you want to send media files please type the command: \n 'Send media' and the name of the file you want to send.): ");
                     System.out.println("For example: Send media myphoto.jpg): ");
                     String message = keyboard.readLine();
-                    if(message.equalsIgnoreCase("send media")){
+                    if (message.equalsIgnoreCase("send media")) {
                         String[] filetosend = message.split("send media ");
                         try (Stream<Path> pathStream = Files.find("C", //we want to search in the local drive (c:\\)
                                 Integer.MAX_VALUE, //we want to search into all folder levels (subfolder of c) so we set maxDepth=Integer.MAX_VALUE
                                 (p, basicFileAttributes) ->
                                         p.getFileName().toString().equalsIgnoreCase(filetosend))
                         ) {
-                            match = pathStream.collect(Collectors.toList()); //match is the file found
+                            match = pathStream.collect(Collectors.toList()); //match is the file found in user's local drive
                         }
                     }
+                */
 
-
-
-                //Second selection
+                    //NOT NEEDED
+                    //Second selection
                 /*
 
-                    //not needed
                     Boolean listedSongs = false; // This is set to true after listing the songs of the artist that has been chosen
                     while(true) {
                         String consumerQuery;
@@ -160,16 +159,16 @@ public class Consumer implements Node {
                 }else {
                     System.out.println("The artist " + topic + " is not available!");
                 } */
-            }
+                }
 
-        } catch (UnknownHostException unknownHost) {
-            System.err.println("You are trying to connect to an unknown host!");
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            } catch(UnknownHostException unknownHost){
+                System.err.println("You are trying to connect to an unknown host!");
+            } catch(IOException ioException){
+                ioException.printStackTrace();
+            } catch(ClassNotFoundException e){
+                e.printStackTrace();
+            }
         }
-    }
 
     public List<Broker> getBrokers(){
         return brokers;
