@@ -8,6 +8,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.security.MessageDigest;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
  * Consumer is the user(client) that asks for groups and messages.
@@ -17,12 +22,14 @@ public class Consumer implements Node {
     private int consumerId;
     private Socket requestSocket = null;
     private PrintWriter initializeQuery;
+    private BufferedWriter writer;
     private BufferedReader out;
     private BufferedReader keyboard;
     private InputStreamReader input;
     private ObjectInputStream inB;
     private String consumerName;
     private List<Info> brokerInfo = new ArrayList<>();
+    Scanner scanner = new Scanner(System.in);
 
     public static void main(String[]args) throws IOException{
         Consumer c1 = new Consumer();
@@ -70,8 +77,8 @@ public class Consumer implements Node {
                     for(Group existingGroups:i.getExistingGroups()) {  //accessing the existing groups/topics of the broker
                         if(topic.equalsIgnoreCase(existingGroups.getGroupName())) { //if the topic the user entered belongs to one of the existing ones
                             groupFound = true; //the group is found
-                            if(!(requestSocket.getPort() == Integer.parseInt(i.getPort()))){ //if consumer isn't already connected to the correct broker.
-                                initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread.
+                            if(!(requestSocket.getPort() == Integer.parseInt(i.getPort()))){ //if consumer isn't already connected to the correct broker
+                                initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
                                 disconnect();
                                 connect(Integer.parseInt(i.getPort())); //connecting to a new broker
                                 initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId to the new broker
@@ -81,8 +88,39 @@ public class Consumer implements Node {
                     }
                 }
 
-                //Second selection - not needed
-                /*if(groupFound) {
+                // ------- SEND MEDIA COMMAND --------
+                List<Path> result;
+                if(groupFound) {
+                    System.out.println("Type the text you want to send. \nIf you want to send media files please type the command: \n 'Send media' and the name of the file you want to send.): ");
+                    System.out.println("For example: Send media myphoto.jpg): ");
+                    String message = keyboard.readLine();
+                    if(message.equalsIgnoreCase("send media")){
+                        String[] filetosend = message.split("send media ");
+                        try (Stream<Path> pathStream = Files.find("C",
+                                Integer.MAX_VALUE, //we want to search into all folder levels (subfolder of c) so we set maxDepth=Integer.MAX_VALUE
+                                (p, basicFileAttributes) ->
+                                        p.getFileName().toString().equalsIgnoreCase(filetosend))
+                        ) {
+                            result = pathStream.collect(Collectors.toList()); //result is file found
+                        }
+                    }
+
+
+                    /*try (Stream<Path> pathStream = Files.find("C",
+                                Integer.MAX_VALUE,   //we want to search into all folder levels (subfolder of c) so we set maxDepth=Integer.MAX_VALUE
+                                (p, basicFileAttributes)->{
+                                    // if directory or no-read permission, ignore
+                                    if(Files.isDirectory(p) || !Files.isReadable(p)){
+                                        return false;
+                                    }
+                                    return p.getFileName().toString().equalsIgnoreCase(filetosend);
+                                })
+                    }
+                )*/
+                //Second selection
+                /*
+
+                    //not needed
                     Boolean listedSongs = false; // This is set to true after listing the songs of the artist that has been chosen
                     while(true) {
                         String consumerQuery;
@@ -205,6 +243,7 @@ public class Consumer implements Node {
         }
     }
     public void showConversationData(Group groupName, Value value) {} //Shows conversation of a specific group (with the name 'groupName')
+
 
     @Override
     public void updateNodes() {}
