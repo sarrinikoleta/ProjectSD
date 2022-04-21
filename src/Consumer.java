@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.security.MessageDigest;
 import java.math.BigInteger;
-import java.nio.file.Files;
+import java.nio.file.Files; //imports for file searching
 import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
@@ -88,35 +88,25 @@ public class Consumer implements Node {
                     }
                 }
 
-                // ------- SEND MEDIA COMMAND --------
-                List<Path> result;
+                // ------- FINDING MEDIA FILE --------
+                List<Path> match;
                 if(groupFound) {
                     System.out.println("Type the text you want to send. \nIf you want to send media files please type the command: \n 'Send media' and the name of the file you want to send.): ");
                     System.out.println("For example: Send media myphoto.jpg): ");
                     String message = keyboard.readLine();
                     if(message.equalsIgnoreCase("send media")){
                         String[] filetosend = message.split("send media ");
-                        try (Stream<Path> pathStream = Files.find("C",
+                        try (Stream<Path> pathStream = Files.find("C", //we want to search in the local drive (c:\\)
                                 Integer.MAX_VALUE, //we want to search into all folder levels (subfolder of c) so we set maxDepth=Integer.MAX_VALUE
                                 (p, basicFileAttributes) ->
                                         p.getFileName().toString().equalsIgnoreCase(filetosend))
                         ) {
-                            result = pathStream.collect(Collectors.toList()); //result is file found
+                            match = pathStream.collect(Collectors.toList()); //match is the file found
                         }
                     }
 
 
-                    /*try (Stream<Path> pathStream = Files.find("C",
-                                Integer.MAX_VALUE,   //we want to search into all folder levels (subfolder of c) so we set maxDepth=Integer.MAX_VALUE
-                                (p, basicFileAttributes)->{
-                                    // if directory or no-read permission, ignore
-                                    if(Files.isDirectory(p) || !Files.isReadable(p)){
-                                        return false;
-                                    }
-                                    return p.getFileName().toString().equalsIgnoreCase(filetosend);
-                                })
-                    }
-                )*/
+
                 //Second selection
                 /*
 
