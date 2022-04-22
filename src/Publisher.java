@@ -23,11 +23,13 @@ import java.math.BigInteger;
 public class Publisher implements Node {
     private ExecutorService pool2 = Executors.newFixedThreadPool(100); //Initializing the thread pool. Each publisher can run 100 threads (queries) in parallel.
     private ServerSocket providerSocket; //The server socket that accepts the brokers' queries.
-    private List<Group> groups = new ArrayList<>(); //List of assigned artists that a certain Publisher has.
+    private List<Group> groups = new ArrayList<>(); //List of assigned groups that a certain Publisher has.
     //private List<Mp3File> songs = new ArrayList<>(); //List of all the songs that are assigned to a certain Publisher. (In Mp3File format for easy access to Id3v2/Id3v1 tags).
     //private List<File> filesRead = new ArrayList<>(); //List of all the songs in file format. (Easy access to the byte array of a song).
     private int publisherId;
 
+
+    //Otan kanei to arxiko read me olous tous users tha arxikopoiei kai onomata
    // private ProfileName profileName = new ProfileName();
 
     public static void main(String[]args) throws IOException {//,UnsupportedTagException, InvalidDataException{
@@ -69,7 +71,8 @@ public class Publisher implements Node {
         }
 
         writer.close();
-/*
+
+        /*
         for(int i=directoriesRead; i<directories.length; i++) { //In this for loop, we initialize the publisher's File and Mp3File lists.
             File file = new File(directories[i].getParent() + "/" + directories[i].getName()); //Initializing artist's folder path.
             File[] files = file.listFiles(); //Listing the songs of the artist.
@@ -134,7 +137,6 @@ public class Publisher implements Node {
         }
 */
 
-
         p.init(port); //Finally we initialize the Publisher.
     }
 
@@ -142,10 +144,9 @@ public class Publisher implements Node {
     public void getBrokerList() {}
 
 
+   // Method hashTopic returns the topicList for a certain hashKey.
 
-   //   Method    hashTopic
-
-    public List<Group> hashTopic(List<Group> groupList, int hashKey){ //Returns the topicList for a certain hashKey.
+    public List<Group> hashTopic(List<Group> groupList, int hashKey){
         List<Group> topic = new ArrayList<>();
         int[] ipPort = new int[3];
         String hash;
@@ -229,7 +230,7 @@ public class Publisher implements Node {
             String brokerQuery = brokerReader.readLine(); //Broker query.
 
             int hashkey = Integer.parseInt(brokerQuery); //Receiving the broker's ip+port hashkey.
-            List<Group> topicList = hashTopic(getGroup(), hashkey); //Creates the topicList for the broker, which contains all the artistNames that have to be assigned to the Broker based on his hashkey.
+            List<Group> topicList = hashTopic(getGroup(), hashkey); //Creates the topicList for the broker, which contains all the Groups that have to be assigned to the Broker based on his hashkey.
             for(Group group:topicList) {
                 out.writeObject(group); //Pushing topicList to the broker.
                 out.flush();
@@ -242,6 +243,7 @@ public class Publisher implements Node {
             brokerInit.close();
             brokerCount++;
         }
+
         while(true) { //After initializing all the brokers, Publisher is ready to accept queries.
             System.out.println("[PUBLISHER] Waiting for broker connection.");
             Socket client = providerSocket.accept();

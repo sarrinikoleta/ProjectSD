@@ -1,18 +1,13 @@
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
+import java.net.*;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 import java.math.BigInteger;
 import java.nio.file.Files; //imports for file searching
 import java.nio.file.Paths;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /*
  * Consumer is the user(client) that asks for groups and messages.
@@ -22,23 +17,22 @@ public class Consumer implements Node {
     private int consumerId;
     private Socket requestSocket = null;
     private PrintWriter initializeQuery;
-    private BufferedWriter writer;
+    //private BufferedWriter writer;
     private BufferedReader out;
     private BufferedReader keyboard;
     private InputStreamReader input;
     private ObjectInputStream inB;
-    private String consumerName;
     private List<Info> brokerInfo = new ArrayList<>();
-    Scanner scanner = new Scanner(System.in);
+    //Scanner scanner = new Scanner(System.in);
 
     public static void main(String[]args) throws IOException{
         Consumer c1 = new Consumer();
-
-
         c1.connect(); //Connecting to a random Broker.
+
         System.out.println("Enter Profile name: ");
         String consumerName = c1.getKeyboard().readLine();
-        c1.setConsumerName(consumerName);
+        ProfileName name = new ProfileName(consumerName);
+
         c1.init(c1.getSocket().getPort()); //Initializes the Consumer
         System.out.println("Bye!");
     }
@@ -80,6 +74,7 @@ public class Consumer implements Node {
                             if (!(requestSocket.getPort() == Integer.parseInt(i.getPort()))) { //if consumer isn't already connected to the correct broker
                                 initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
                                 disconnect();
+               //EDW PREPEI NA PHGAINOUME AMESWS STON SWSTO BROKER, OXI SE ENAN TYXAIO EPOMENO
                                 connect(Integer.parseInt(i.getPort())); //connecting to a new broker
                                 initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId to the new broker
                             }
@@ -188,7 +183,6 @@ public class Consumer implements Node {
                 }
             }
 
-
             keyboard = new BufferedReader(new InputStreamReader(System.in));
             input = new InputStreamReader(requestSocket.getInputStream());
             out = new BufferedReader(input);
@@ -220,6 +214,7 @@ public class Consumer implements Node {
     public void disconnect(Broker broker, Group groupName) {} //Disconnects from the group
 
     public void register(Broker broker, Group groupName) {} //Registers into a group
+
     public void disconnect() {//Disconnects from a Broker and closes sockets, readers/writers and I/O streams
         try {
             out.close();
@@ -231,21 +226,15 @@ public class Consumer implements Node {
             e.printStackTrace();
         }
     }
-    public void showConversationData(Group groupName, Value value) {} //Shows conversation of a specific group (with the name 'groupName')
 
+    //Shows conversation of a specific group (with the name 'groupName')
+    public void showConversationData(Group groupName, Value value) {}
 
     @Override
     public void updateNodes() {}
+
     public Socket getSocket() {
         return requestSocket;
-    }
-
-    public void setConsumerName(String name) {
-        this.consumerName = name;
-    }
-
-    public String getConsumerName() {
-        return this.consumerName;
     }
 
     public BufferedReader getKeyboard(){

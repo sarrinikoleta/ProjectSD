@@ -95,7 +95,7 @@ public class Broker implements Node {
                 Publisher p = new Publisher();
                 Boolean publisherExists = false;
                 p.setPublisherId(publisherId);
-                Group topic = (Group) initStream.readObject(); //Reading the first artistName that the Publisher sent.
+                Group topic = (Group) initStream.readObject(); //Reading the first Group that the Publisher sent.
 
 
                 while(!topic.getGroupName().equalsIgnoreCase("")) { //Initializing topicList and registeredPublishers. (String "" is a terminal message sent by the publisher).
