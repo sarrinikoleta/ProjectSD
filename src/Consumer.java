@@ -17,13 +17,14 @@ public class Consumer implements Node {
     private int consumerId;
     private Socket requestSocket = null;
     private PrintWriter initializeQuery;
-    //private BufferedWriter writer;
+    private BufferedWriter writer;
     private BufferedReader out;
     private BufferedReader keyboard;
     private InputStreamReader input;
     private ObjectInputStream inB;
     private List<Info> brokerInfo = new ArrayList<>();
     //Scanner scanner = new Scanner(System.in);
+    private ProfileName name;
 
     public static void main(String[]args) throws IOException{
         Consumer c1 = new Consumer();
@@ -34,6 +35,12 @@ public class Consumer implements Node {
         ProfileName name = new ProfileName(consumerName);
 
         c1.init(c1.getSocket().getPort()); //Initializes the Consumer
+
+        // Infinite loop to read and send messages.
+        c1.listenForMessage();
+        c1.sendMessage();
+
+
         System.out.println("Bye!");
     }
 
@@ -75,6 +82,14 @@ public class Consumer implements Node {
                                 initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
                                 disconnect();
                //EDW PREPEI NA PHGAINOUME AMESWS STON SWSTO BROKER, OXI SE ENAN TYXAIO EPOMENO
+
+
+                                //paei ston swsto broker . den paei se tyxaio epomeno
+                                //exei mpei sto "   if (topic.equalsIgnoreCase(existingGroups.getGroupName()))   "
+                                //kai kanei connect ston broker pou einai i terma panw for "for (Info i : getBrokerInfo())"
+                                //diladi ekei pou exei vrei kai to topic
+
+
                                 connect(Integer.parseInt(i.getPort())); //connecting to a new broker
                                 initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId to the new broker
                             }
@@ -165,6 +180,77 @@ public class Consumer implements Node {
                 e.printStackTrace();
             }
         }
+
+
+
+    // Sending a message isn't blocking and can be done without spawning a thread, unlike waiting for a message.
+    public void sendMessage() {
+        try {
+            // Initially send the username of the client.
+            writer.write(name.getProfileName());
+            writer.newLine();
+            writer.flush();
+            // Create a scanner for user input.
+            Scanner scanner = new Scanner(System.in);
+            // While there is still a connection with the server, continue to scan the terminal and then send the message.
+            while (requestSocket.isConnected()) {
+                String messageToSend = scanner.nextLine();
+                writer.write(name.getProfileName() + ": " + messageToSend);
+                writer.newLine();
+                writer.flush();
+            }
+        } catch (IOException e) {
+            // Gracefully close everything.
+            closeEverything(requestSocket, out, writer);
+        }
+    }
+
+    // Listening for a message is blocking so need a separate thread for that.
+    public void listenForMessage() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String msgFromGroupChat;
+                // While there is still a connection with the server, continue to listen for messages on a separate thread.
+                while (requestSocket.isConnected()) {
+                    try {
+                        // Get the messages sent from other users and print it to the console.
+                        msgFromGroupChat = out.readLine();
+                        System.out.println(msgFromGroupChat);
+                    } catch (IOException e) {
+                        // Close everything gracefully.
+                        closeEverything(requestSocket, out, writer);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    // Helper method to close everything so you don't have to repeat yourself.
+    public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
+        // Note you only need to close the outer wrapper as the underlying streams are closed when you close the wrapper.
+        // Note you want to close the outermost wrapper so that everything gets flushed.
+        // Note that closing a socket will also close the socket's InputStream and OutputStream.
+        // Closing the input stream closes the socket. You need to use shutdownInput() on socket to just close the input stream.
+        // Closing the socket will also close the socket's input stream and output stream.
+        // Close the socket after closing the streams.
+        try {
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
+            if (bufferedWriter != null) {
+                bufferedWriter.close();
+            }
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     public List<Broker> getBrokers(){
         return brokers;

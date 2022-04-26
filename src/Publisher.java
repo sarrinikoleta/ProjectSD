@@ -144,7 +144,8 @@ public class Publisher implements Node {
     public void getBrokerList() {}
 
 
-   // Method hashTopic returns the topicList for a certain hashKey.
+    // Method hashTopic returns the topicList for a certain hashKey.
+    //calculate MD5 hash value
 
     public List<Group> hashTopic(List<Group> groupList, int hashKey){
         List<Group> topic = new ArrayList<>();
@@ -173,8 +174,8 @@ public class Publisher implements Node {
             }
             Arrays.sort(ipPort); //sorting array to find where the hashkey belongs easier.
 
-            for(Group group:groupList) {//Creating hashKeys for all the artists.
-                Boolean f = false; //this will remain false if the artistName(key) > ipPort[](keys)
+            for(Group group:groupList) {//Creating hashKeys for all the groups.
+                Boolean f = false; //this will remain false if the groupName(key) > ipPort[](keys)
                 String groupName = group.getGroupName();
                 md = MessageDigest.getInstance("MD5");
                 md.update(groupName.getBytes());
@@ -197,7 +198,7 @@ public class Publisher implements Node {
                         }
                     }
                 }
-                if(!f) { //If the hashkey of the artist > highest broker haskey, then assign this artist to the broker if he has the smallest.
+                if(!f) { //If the hashkey of the group > highest broker haskey, then assign this group to the broker if he has the smallest.
                     if(hashKey == ipPort[0] && hashCode > ipPort[ipPort.length-1]) {
                         topic.add(new Group(groupName));
                     }
