@@ -29,7 +29,7 @@ public class Consumer implements Node {
         Consumer c1 = new Consumer();
         c1.connect(); //Connecting to a random Broker.
 
-        System.out.println("Enter Profile name: ");
+        System.out.println("Enter profile name: ");
         String consumerName = c1.getKeyboard().readLine();
         ProfileName name = new ProfileName(consumerName);
 
@@ -49,7 +49,7 @@ public class Consumer implements Node {
                 getBrokerInfo().add(info);
                 info = (Info) inB.readObject();
             }
-            System.out.println("Available chats/topics to enter: ");  //printing groups/topics for which a broker is responsible
+            System.out.println("Available group-chats/topics to enter: ");  //printing groups/topics for which a broker is responsible
             for (Info i : getBrokerInfo()) {
                 for (Group topic : i.getExistingGroups()) {
                     System.out.println(topic.getGroupName());
@@ -58,7 +58,7 @@ public class Consumer implements Node {
 
             while (true) {
                 groupFound = false; //This is set to true if the group/topic from the query exists
-                System.out.println("Type the name of an available group (type 'quit' to disconnect): ");
+                System.out.println("Type the name of an available group-chat/topic (type 'quit' to disconnect): ");
                 String topic = keyboard.readLine().trim();
 
                 if (topic.equals("quit")) { //Terminal message
@@ -84,7 +84,8 @@ public class Consumer implements Node {
                 }
 
                 // ------- FINDING MEDIA FILE --------
-                /*List<Path> match;
+                /*
+                List<Path> match;
                 if (groupFound) {
                     System.out.println("Type the text you want to send. \nIf you want to send media files please type the command: \n 'Send media' and the name of the file you want to send.): ");
                     System.out.println("For example: Send media myphoto.jpg): ");

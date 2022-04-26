@@ -3,7 +3,7 @@ import java.io.Serializable;
 /* MultimediaFile objects are used to store the File's information.
  * The strings multimediaFileName, profileName, dateCreated, length,
  * framerate, frameHeight, frameWidth are extracted from
- * the Id3v1Tag of the multimedia file that the consumer wants to receive.
+ * ///////the Id3v1Tag///////ALLAZOUME ANALOGA of the multimedia file that the consumer wants to receive.
  * The byte[] multimediaFileChunk is extracted from the file itself.
  */
 
