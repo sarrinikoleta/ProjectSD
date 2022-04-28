@@ -276,7 +276,7 @@ public class Publisher implements Node {
 
     //ActionsForBrokers
 
-    /*
+
     private class ActionsForBrokers extends Thread {
         private Socket requestSocket;   //Broker's socket.
         //Reader/writers and I/O streams.
@@ -289,14 +289,27 @@ public class Publisher implements Node {
             this.requestSocket = socket;
         }
 
-        public void push(String requestedArtist, String requestedSong) { //Pushes value objects.
-            Boolean songFound = false; //This is used to indicate whether or not the song has be en found in the dataset.
-            System.out.println("Broker query: " + requestedArtist + " " + requestedSong);
+        public void push(String requestedGroup, Value message) { //Pushes value objects.
+            Boolean groupFound = false; //This is used to indicate wheather or not the group has been found in the dataset.
+            System.out.println("Broker query: " + requestedGroup);
             Value v = null;
-            MusicFile m = null;
-            Mp3File s = null;
-            try {
-                for (int i = 0; i < songs.size(); i++) { //Checking if the requested song exists in the songs list.
+            // m = null;
+            //Mp3File s = null;
+             /* for (Info i : getBrokerInfo()) { //accessing the info (ip,port,id) of the broker
+                    for (Group existingGroups : i.getExistingGroups()) {  //accessing the existing groups/topics of the broker
+                        if (topic.equalsIgnoreCase(existingGroups.getGroupName())) { //if the topic the user entered belongs to one of the existing ones
+                            groupFound = true; //the group is found
+                            if (!(requestSocket.getPort() == Integer.parseInt(i.getPort()))) { //if consumer isn't already connected to the correct broker
+                                initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
+                                disconnect();
+                                connect(Integer.parseInt(i.getPort())); //connecting to a new broker
+                                initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId to the new broker
+                            }
+                            initializeQuery.println(topic); //Sending query to the Broker
+                        }
+                    }
+                } */
+                /*for (int i = 0; i < songs.size(); i++) { //Checking if the requested song exists in the songs list.
                     if (requestedSong.equalsIgnoreCase(songs.get(i).getId3v1Tag().getTitle()) && requestedArtist.equalsIgnoreCase(songs.get(i).getId3v1Tag().getArtist())) {
                         songFound = true;
                         s = songs.get(i);
@@ -321,8 +334,8 @@ public class Publisher implements Node {
                 v = new Value(m);
                 out.writeObject(v); //Sends terminal value.
                 out.flush();
-                if (!songFound) {
-                    notifyFailure(requestedArtist); //Sending the list of all the available songs the requested artist has to the broker.
+                if (!groupFound) {
+                    notifyFailure(requestedGroup);//Sending the list of all the available songs the requested artist has to the broker.
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -331,7 +344,7 @@ public class Publisher implements Node {
 
         }
 
-        public void notifyFailure(String requestedArtist) { //If the requested song does not exist, the Publisher notifies the Broker by sending the current available song list.
+        public void notifyFailure(String requestedGroup) { //If the requested group does not exist, the Publisher notifies the Broker.
             /*
             String listedSongs = "";
             for(File f: filesRead) {

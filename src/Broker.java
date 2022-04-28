@@ -13,11 +13,10 @@ import java.security.NoSuchAlgorithmException;
 
 public class Broker implements Node {
     private List<Consumer> registeredUsers = new ArrayList<>(); //List of registered Consumers.
-    private List<Publisher> registeredPublisher = new ArrayList<>(); //All the publishers that have artists that should be saved in this broker.
-    //private List<ArtistName> registeredArtists = new ArrayList<>(); //All the artists that are saved in this broker.
+    private List<Publisher> registeredPublisher = new ArrayList<>();
+    private Queue<MultimediaFile> sentFiles = new LinkedList<>(); //All sent texts and files will be stored in a queue.
 
 
-    //!!!!!!!!   Απ ότι κατάλαβα Artists είναι τα δικά μας Groups (topics)
     private List<Group> existingGroups = new ArrayList<Group>();
 
     private Info brokerInfo = new Info(); //Contains this broker's information.
@@ -242,7 +241,7 @@ public class Broker implements Node {
                 while(true) { //This is where the Broker pulls from the Publisher and pushes to the Consumer the mp3 that's been asked from the query.
                     String artistName = out.readLine(); //Consumer artistName query.
 
-                    for(Publisher p:getRegisteredPublisher()) { //Looking for the artistName in all the registeredPublishers.
+                    for(Publisher p:getRegisteredPublisher()) { //Looking for the groupName in all the registeredPublishers.
                         for(ArtistName artist:p.getArtists()) {
                             if(artist.getArtistName().equalsIgnoreCase(artistName)) {
                                 if(p.getPublisherId() == 0) { //Connecting to the correct Publisher.
