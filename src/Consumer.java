@@ -13,6 +13,7 @@ import java.nio.file.Path;
  * Consumer is the user(client) that asks for groups and messages.
  * He receives the chunks from the Broker(server) and creates the chunk files inside the Downloaded Chunks folder.
  */
+
 public class Consumer implements Node {
     private int consumerId;
     private Socket requestSocket = null;
@@ -24,31 +25,13 @@ public class Consumer implements Node {
     private ObjectInputStream inB;
     private List<Info> brokerInfo = new ArrayList<>();
     //Scanner scanner = new Scanner(System.in);
-    private ProfileName name;
-
-    public static void main(String[]args) throws IOException{
-        Consumer c1 = new Consumer();
-        c1.connect(); //Connecting to a random Broker.
-
-        System.out.println("Enter profile name: ");
-        String consumerName = c1.getKeyboard().readLine();
-        ProfileName name = new ProfileName(consumerName);
-
-        c1.init(c1.getSocket().getPort()); //Initializes the Consumer
-
-        // Infinite loop to read and send messages.
-        c1.listenForMessage();
-        c1.sendMessage();
-
-
-        System.out.println("Bye!");
-    }
+    private ProfileName profileName;
 
     public void init(int port) {
         try {
             Boolean groupFound;
             initializeQuery.println("Initialize broker list.");
-            initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId
+            initializeQuery.println(profileName.getProfileName()); //sending consumerId
 
             Info info = (Info) inB.readObject();//getting broker's info
 
@@ -74,6 +57,8 @@ public class Consumer implements Node {
                     break;
                 }
 
+
+                //AYTO THA GINETAI STON Broker-publisher to search ston broker(epistrefei swsto port), to connect ston publisher
                 for (Info i : getBrokerInfo()) { //accessing the info (ip,port,id) of the broker
                     for (Group existingGroups : i.getExistingGroups()) {  //accessing the existing groups/topics of the broker
                         if (topic.equalsIgnoreCase(existingGroups.getGroupName())) { //if the topic the user entered belongs to one of the existing ones
@@ -81,15 +66,6 @@ public class Consumer implements Node {
                             if (!(requestSocket.getPort() == Integer.parseInt(i.getPort()))) { //if consumer isn't already connected to the correct broker
                                 initializeQuery.println("quit"); //Sending terminal message to the Broker so that he can disconnect and terminate the Thread
                                 disconnect();
-               //EDW PREPEI NA PHGAINOUME AMESWS STON SWSTO BROKER, OXI SE ENAN TYXAIO EPOMENO
-
-
-                                //paei ston swsto broker . den paei se tyxaio epomeno
-                                //exei mpei sto "   if (topic.equalsIgnoreCase(existingGroups.getGroupName()))   "
-                                //kai kanei connect ston broker pou einai i terma panw for "for (Info i : getBrokerInfo())"
-                                //diladi ekei pou exei vrei kai to topic
-
-
                                 connect(Integer.parseInt(i.getPort())); //connecting to a new broker
                                 initializeQuery.println(String.valueOf(getConsumerId())); //sending consumerId to the new broker
                             }
@@ -97,6 +73,7 @@ public class Consumer implements Node {
                         }
                     }
                 }
+
 
                 // ------- FINDING MEDIA FILE --------
                 /*
@@ -182,29 +159,6 @@ public class Consumer implements Node {
         }
 
 
-
-    // Sending a message isn't blocking and can be done without spawning a thread, unlike waiting for a message.
-    public void sendMessage() {
-        try {
-            // Initially send the username of the client.
-            writer.write(name.getProfileName());
-            writer.newLine();
-            writer.flush();
-            // Create a scanner for user input.
-            Scanner scanner = new Scanner(System.in);
-            // While there is still a connection with the server, continue to scan the terminal and then send the message.
-            while (requestSocket.isConnected()) {
-                String messageToSend = scanner.nextLine();
-                writer.write(name.getProfileName() + ": " + messageToSend);
-                writer.newLine();
-                writer.flush();
-            }
-        } catch (IOException e) {
-            // Gracefully close everything.
-            closeEverything(requestSocket, out, writer);
-        }
-    }
-
     // Listening for a message is blocking so need a separate thread for that.
     public void listenForMessage() {
         new Thread(new Runnable() {
@@ -219,38 +173,12 @@ public class Consumer implements Node {
                         System.out.println(msgFromGroupChat);
                     } catch (IOException e) {
                         // Close everything gracefully.
-                        closeEverything(requestSocket, out, writer);
+                        disconnect();
                     }
                 }
             }
         }).start();
     }
-
-    // Helper method to close everything so you don't have to repeat yourself.
-    public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
-        // Note you only need to close the outer wrapper as the underlying streams are closed when you close the wrapper.
-        // Note you want to close the outermost wrapper so that everything gets flushed.
-        // Note that closing a socket will also close the socket's InputStream and OutputStream.
-        // Closing the input stream closes the socket. You need to use shutdownInput() on socket to just close the input stream.
-        // Closing the socket will also close the socket's input stream and output stream.
-        // Close the socket after closing the streams.
-        try {
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
-            if (bufferedWriter != null) {
-                bufferedWriter.close();
-            }
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 
     public List<Broker> getBrokers(){
         return brokers;
@@ -298,24 +226,37 @@ public class Consumer implements Node {
         }
     }
 
-    public void disconnect(Broker broker, Group groupName) {} //Disconnects from the group
-
-    public void register(Broker broker, Group groupName) {} //Registers into a group
-
-    public void disconnect() {//Disconnects from a Broker and closes sockets, readers/writers and I/O streams
+    //Disconnects from a Broker and closes sockets, readers/writers and I/O streams/
+    public void disconnect() {
+        // Note you only need to close the outer wrapper as the underlying streams are closed when you close the wrapper.
+        // Note you want to close the outermost wrapper so that everything gets flushed.
+        // Note that closing a socket will also close the socket's InputStream and OutputStream.
+        // Closing the input stream closes the socket. You need to use shutdownInput() on socket to just close the input stream.
+        // Closing the socket will also close the socket's input stream and output stream.
+        // Close the socket after closing the streams.
         try {
-            out.close();
-            input.close();
+            if (out != null) {
+                out.close();
+            }
+            if (input != null) {
+                input.close();
+            }
+            if (requestSocket != null) {
+                requestSocket.close();
+            }
             initializeQuery.close();
-            requestSocket.close();
             inB.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void disconnect(Broker broker, Group groupName) {} //Disconnects from the group
+
+    public void register(Broker broker, Group groupName) {} //Registers into a group
+
     //Shows conversation of a specific group (with the name 'groupName')
-    public void showConversationData(Group groupName, Value value) {}
+    public void showConversationData(Group groupName) {}
 
     @Override
     public void updateNodes() {}
@@ -342,6 +283,10 @@ public class Consumer implements Node {
 
     public void setConsumerId(int consumerId) {
         this.consumerId = consumerId;
+    }
+
+    public void setProfileName(ProfileName profileName) {
+        this.profileName = profileName;
     }
 }
 

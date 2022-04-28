@@ -7,6 +7,10 @@ import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/*
+ * Broker is the main server, each one of the three stores the information of equal groups/topics.
+ */
+
 public class Broker implements Node {
     private List<Consumer> registeredUsers = new ArrayList<>(); //List of registered Consumers.
     private List<Publisher> registeredPublisher = new ArrayList<>(); //All the publishers that have artists that should be saved in this broker.
@@ -20,7 +24,7 @@ public class Broker implements Node {
     //private ExecutorService pool = Executors.newFixedThreadPool(100); //Broker thread pool.
 
     private ServerSocket providerSocket; //Broker's server socket, this accepts Consumer queries.
-    private int[] ipPort;               //Hashed ip+Port of all the brokers.
+    private int[] ipPort;                //Hashed ip+Port of all the brokers.
     private int brokerId;
 
     //Broker as a client for publisher
@@ -91,9 +95,8 @@ public class Broker implements Node {
 
             initializeQuery.println(getIpPort()[getBrokerId()]); //Sending hashed ip+port key to publisher.
             try {
-                Publisher p = new Publisher();
+                Publisher p = new Publisher(publisherId);
                 Boolean publisherExists = false;
-                p.setPublisherId(publisherId);
                 Group topic = (Group) initStream.readObject(); //Reading the first Group that the Publisher sent.
 
 

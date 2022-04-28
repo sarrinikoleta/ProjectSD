@@ -10,28 +10,46 @@ import java.security.MessageDigest;
 import java.math.BigInteger;
 
 // ΘΑ ΠΡΕΠΕΙ ΝΑ ΤΑ ΑΝΤΙΚΑΤΑΣΤΗΣΟΥΜΕ ΜΕ ΤΟ PACKAGE https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html
-//import com.mpatric.mp3agic.ID3v1;
-//import com.mpatric.mp3agic.ID3v1Tag;
-//import com.mpatric.mp3agic.InvalidDataException;
-//import com.mpatric.mp3agic.Mp3File;
-//import com.mpatric.mp3agic.UnsupportedTagException;
-
-/*
- * Publisher is the main server, each one of the three stores the information of 5 (in this case) groups/topics.
- */
 
 public class Publisher implements Node {
     private ExecutorService pool2 = Executors.newFixedThreadPool(100); //Initializing the thread pool. Each publisher can run 100 threads (queries) in parallel.
-    private ServerSocket providerSocket; //The server socket that accepts the brokers' queries.
+    //private ServerSocket providerSocket; //The server socket that accepts the brokers' queries.
     private List<Group> groups = new ArrayList<>(); //List of assigned groups that a certain Publisher has.
     //private List<Mp3File> songs = new ArrayList<>(); //List of all the songs that are assigned to a certain Publisher. (In Mp3File format for easy access to Id3v2/Id3v1 tags).
     //private List<File> filesRead = new ArrayList<>(); //List of all the songs in file format. (Easy access to the byte array of a song).
-    private int publisherId;
+    private ProfileName profileName;
+
+    private Socket socket = null;   //The publisher has a socket to connect to a broker.
+    private BufferedWriter writer;  //And a writer to send messages.
 
 
-    //Otan kanei to arxiko read me olous tous users tha arxikopoiei kai onomata
-   // private ProfileName profileName = new ProfileName();
+    public Publisher(ProfileName profileName) {
+        this.profileName = profileName;
+    }
 
+    // Sending a message isn't blocking and can be done without spawning a thread, unlike waiting for a message.
+    public void sendMessage() {
+        try {
+            // Initially send the username of the client.
+            writer.write(profileName.getProfileName());
+            writer.newLine();
+            writer.flush();
+            // Create a scanner for user input.
+            Scanner scanner = new Scanner(System.in);
+            // While there is still a connection with the server, continue to scan the terminal and then send the message.
+            while (socket.isConnected()) {
+                String messageToSend = scanner.nextLine();
+                writer.write(profileName.getProfileName() + ": " + messageToSend);
+                writer.newLine();
+                writer.flush();
+            }
+        } catch (IOException e) {
+            // Gracefully close everything.
+            disconnect();
+        }
+    }
+
+    /*
     public static void main(String[]args) throws IOException {//,UnsupportedTagException, InvalidDataException{
         Publisher p = new Publisher();
         System.out.println("[PUBLISHER] Reading dataset!");
@@ -41,7 +59,7 @@ public class Publisher implements Node {
         /*
          * BufferedReader reads the initPublisher.txt, which contains a number, starting from 0 that
          * indicates how many artists have already been read by the previous Publishers.
-         */
+
 
         BufferedReader reader = new BufferedReader(new FileReader("./src/initPublisher.txt")); //This reader is going to be used to receive the initPublisher.txt file information.
         String line;
@@ -72,7 +90,8 @@ public class Publisher implements Node {
 
         writer.close();
 
-        /*
+        //AYTA THA TA KANEI O BROKER STO INIT
+
         for(int i=directoriesRead; i<directories.length; i++) { //In this for loop, we initialize the publisher's File and Mp3File lists.
             File file = new File(directories[i].getParent() + "/" + directories[i].getName()); //Initializing artist's folder path.
             File[] files = file.listFiles(); //Listing the songs of the artist.
@@ -135,11 +154,11 @@ public class Publisher implements Node {
                 }
             }
         }
-*/
+
 
         p.init(port); //Finally we initialize the Publisher.
     }
-
+    */
 
     public void getBrokerList() {}
 
@@ -255,9 +274,9 @@ public class Publisher implements Node {
     }
 
 
-    /*              //ActionsForBrokers
+    //ActionsForBrokers
 
-
+    /*
     private class ActionsForBrokers extends Thread {
         private Socket requestSocket;   //Broker's socket.
         //Reader/writers and I/O streams.
@@ -370,7 +389,9 @@ public class Publisher implements Node {
     @Override
     public void connect() {}
     @Override
-    public void disconnect() {}
+    public void disconnect() {
+
+    }
     @Override
     public void updateNodes() {}
 
@@ -408,16 +429,6 @@ public class Publisher implements Node {
     @Override
     public List<Broker> getBrokers() {
         return brokers;
-    }
-
-
-    public int getPublisherId() {
-        return publisherId;
-    }
-
-
-    public void setPublisherId(int publisherId) {
-        this.publisherId = publisherId;
     }
 
 
