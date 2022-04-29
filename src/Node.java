@@ -10,9 +10,9 @@ import java.net.*;
 
 public interface Node {
     public static final String ip = "LocalHost";
-    public static final int FIRSTPUBLISHER = 4321;
-    public static final int SECONDPUBLISHER = 3421;
-    public static final int THIRDPUBLISHER = 5000;
+    public static final int FIRSTUSER = 4321;
+    public static final int SECONDUSER = 3421;
+    public static final int THIRDUSER = 5000;
     public static final int FIRSTBROKER = 4000;
     public static final int SECONDBROKER = 5555;
     public static final int THIRDBROKER = 5984;

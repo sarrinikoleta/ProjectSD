@@ -12,16 +12,12 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class Broker implements Node {
-    private List<Consumer> registeredUsers = new ArrayList<>(); //List of registered Consumers.
-    private List<Publisher> registeredPublisher = new ArrayList<>();
+    private List<UserNode> registeredUsers = new ArrayList<>(); //List of registered Consumers.
+    //private List<Publisher> registeredPublisher = new ArrayList<>();
     private Queue<MultimediaFile> sentFiles = new LinkedList<>(); //All sent texts and files will be stored in a queue.
-
-
     private List<Group> existingGroups = new ArrayList<Group>();
-
     private Info brokerInfo = new Info(); //Contains this broker's information.
     //private ExecutorService pool = Executors.newFixedThreadPool(100); //Broker thread pool.
-
     private ServerSocket providerSocket; //Broker's server socket, this accepts Consumer queries.
     private int[] ipPort;                //Hashed ip+Port of all the brokers.
     private int brokerId;
@@ -69,24 +65,24 @@ public class Broker implements Node {
 
         writer.close();
 
-        //b.calculateKeys(); //Check method.
+        b.calculateKeys(); //Check method.
 
         b.init(port);
     }
 
-
+    //Σύνδεση Broker με UserNode αντί Publisher !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public void init(int port) throws UnknownHostException, IOException{
         providerSocket = new ServerSocket(port);
         System.out.println("[BROKER] "+ getBrokerId() + " Initializing data.");
-        int publisherId = 0;
+        int userId = 0;
         Socket initializeSocket = null;
-        while(publisherId<3) {
-            if(publisherId == 0) {
-                initializeSocket = new Socket(ip, FIRSTPUBLISHER); //This socket will be used to initialize this broker. (Retrieving data from publishers)
-            }else if(publisherId == 1) {
-                initializeSocket = new Socket(ip, SECONDPUBLISHER);
+        while(userId<3) {
+            if(userId == 0) {
+                initializeSocket = new Socket(ip, FIRSTUSER); //This socket will be used to initialize this broker. (Retrieving data from publishers)
+            }else if(userId == 1) {
+                initializeSocket = new Socket(ip, SECONDUSER);
             }else {
-                initializeSocket = new Socket(ip, THIRDPUBLISHER);
+                initializeSocket = new Socket(ip, THIRDUSER);
             }
 
             PrintWriter initializeQuery = new PrintWriter(initializeSocket.getOutputStream(), true);
@@ -94,22 +90,23 @@ public class Broker implements Node {
 
             initializeQuery.println(getIpPort()[getBrokerId()]); //Sending hashed ip+port key to publisher.
             try {
-                Publisher p = new Publisher(publisherId);
-                Boolean publisherExists = false;
-                Group topic = (Group) initStream.readObject(); //Reading the first Group that the Publisher sent.
+                UserNode u = new UserNode(userId);
+                Boolean UserExists = false;
+                Group topic = (Group) initStream.readObject(); //Reading the first Group that the UserNode sent.
 
 
                 while(!topic.getGroupName().equalsIgnoreCase("")) { //Initializing topicList and registeredPublishers. (String "" is a terminal message sent by the publisher).
-                    for(Publisher registeredP:registeredPublisher) {
-                        if(p.getPublisherId() == registeredP.getPublisherId()) {
-                            publisherExists = true;
+                    for(UserNode registeredU:registeredUsers) {
+                        if(u.getUserID() == registeredU.getUserID()) {
+                            UserExists = true;
                         }
                     }
-                    if(!publisherExists) {
-                        getRegisteredPublisher().add(p);
+                    if(!UserExists) {
+                        getRegisteredUsers().add(u);
                     }
                     System.out.println(topic.getGroupName());
-                    p.getGroup().add(topic);
+                    u.getGroup().add(topic);
+
                     getExistingGroups().add(topic);
                     topic = (Group) initStream.readObject(); //Reading the next groupName that the Publisher sent.
                 }
@@ -127,9 +124,10 @@ public class Broker implements Node {
                     ioException.printStackTrace();
                 }
             }
-            publisherId++;
+            userId++;
             initializeSocket.close();
         }
+
 
         //Initializing info list  Info {ListOfBrokers {IP,Port} , < BrokerId, ArtistName>}
         //Στην περίπτωση μας
@@ -153,7 +151,6 @@ public class Broker implements Node {
             Socket client = providerSocket.accept();
 
             System.out.println("[BROKER] Connected to a consumer!");
-
 
             //ActionsForConsumers consumerThread = new ActionsForConsumers(client);
             //pool.execute(consumerThread);
@@ -193,11 +190,11 @@ public class Broker implements Node {
                     consumerQuery = out.readLine(); //reading consumer id
                     Consumer c = new Consumer();
                     c.setConsumerId(Integer.parseInt(consumerQuery));
-                    for(Consumer registeredConsumer:getRegisteredUsers()) {
-                        if(!(registeredConsumer.getConsumerId() == c.getConsumerId())) { //adding new customer (if he does not already exist in registeredUser list.
-                            getRegisteredUsers().add(c);
-                        }
-                    }
+                    //for(Consumer registeredConsumer:getRegisteredUsers()) {
+                      //  if(!(registeredConsumer.getConsumerId() == c.getConsumerId())) { //adding new customer (if he does not already exist in registeredUser list.
+                          //  getRegisteredUsers().add(c);
+                       // }
+                   // }
 
 
                     for(int i=0; i<3; i++) { //reading broker info files.
@@ -331,6 +328,7 @@ public class Broker implements Node {
         this.ipPort = ipPort;
     }
 
+
     public int getBrokerId() {
         return brokerId;
     }
@@ -362,11 +360,9 @@ public class Broker implements Node {
         return this.existingGroups;
     }
 
-    public List<Publisher> getRegisteredPublisher() {
-        return registeredPublisher;
-    }
+    //public List<Publisher> getRegisteredPublisher() {return registeredPublisher;}
 
-    public List<Consumer> getRegisteredUsers() { return registeredUsers; }
+    public List<UserNode> getRegisteredUsers() { return registeredUsers; }
 
 
     //δημιουργεί ένα πίνακα hashedKeys[3] που έχει το hashkey κάθε broker

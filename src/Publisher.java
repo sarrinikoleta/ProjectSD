@@ -12,13 +12,12 @@ import java.math.BigInteger;
 // ΘΑ ΠΡΕΠΕΙ ΝΑ ΤΑ ΑΝΤΙΚΑΤΑΣΤΗΣΟΥΜΕ ΜΕ ΤΟ PACKAGE https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html
 
 public class Publisher implements Node {
-    private ExecutorService pool2 = Executors.newFixedThreadPool(100); //Initializing the thread pool. Each publisher can run 100 threads (queries) in parallel.
+    //private ExecutorService pool2 = Executors.newFixedThreadPool(100); //Initializing the thread pool. Each publisher can run 100 threads (queries) in parallel.
     //private ServerSocket providerSocket; //The server socket that accepts the brokers' queries.
-    private List<Group> groups = new ArrayList<>(); //List of assigned groups that a certain Publisher has.
+    //private List<Group> groups = new ArrayList<>(); //List of assigned groups that a certain Publisher has.
     //private List<Mp3File> songs = new ArrayList<>(); //List of all the songs that are assigned to a certain Publisher. (In Mp3File format for easy access to Id3v2/Id3v1 tags).
     //private List<File> filesRead = new ArrayList<>(); //List of all the songs in file format. (Easy access to the byte array of a song).
     private ProfileName profileName;
-
     private Socket socket = null;   //The publisher has a socket to connect to a broker.
     private BufferedWriter writer;  //And a writer to send messages.
 
@@ -39,6 +38,9 @@ public class Publisher implements Node {
             // While there is still a connection with the server, continue to scan the terminal and then send the message.
             while (socket.isConnected()) {
                 String messageToSend = scanner.nextLine();
+
+                //edw elegxoume an grapsei "send media : "
+
                 writer.write(profileName.getProfileName() + ": " + messageToSend);
                 writer.newLine();
                 writer.flush();
@@ -430,14 +432,7 @@ public class Publisher implements Node {
     }
 
 */
-    public List<Group> getGroup(){
-        return this.groups;
-    }
 
-
-    public void setGroup(List<Group> groups) {
-        this.groups = groups;
-    }
 
     @Override
     public List<Broker> getBrokers() {
