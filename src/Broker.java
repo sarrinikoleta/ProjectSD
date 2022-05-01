@@ -12,7 +12,8 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class Broker implements Node {
-    private List<UserNode> registeredUsers = new ArrayList<>(); //List of registered Consumers.
+    private List<UserNode> registeredUsers = new ArrayList<>(); //List of registered Users.
+    //Από Απορίες 3σελ ( Μια λίστα με registeredUsers και όχι ξεχωριστά για Publishers και Consumers ).
     //private List<Publisher> registeredPublisher = new ArrayList<>();
     private Queue<MultimediaFile> sentFiles = new LinkedList<>(); //All sent texts and files will be stored in a queue.
     private List<Group> existingGroups = new ArrayList<Group>();
