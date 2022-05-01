@@ -21,6 +21,9 @@ public class Publisher implements Node {
     private Socket socket = null;   //The publisher has a socket to connect to a broker.
     private BufferedWriter writer;  //And a writer to send messages.
 
+    public Publisher(Socket connection) {
+        this.socket = connection;
+    }
 
     public Publisher(ProfileName profileName) {
         this.profileName = profileName;

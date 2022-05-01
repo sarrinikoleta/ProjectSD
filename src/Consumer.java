@@ -21,11 +21,17 @@ public class Consumer implements Node {
     private BufferedWriter writer;
     private BufferedReader out;
     private BufferedReader keyboard;
+
     private InputStreamReader input;
+    private ObjectInputStream output;
     private ObjectInputStream inB;
     private List<Info> brokerInfo = new ArrayList<>();
     //Scanner scanner = new Scanner(System.in);
     private ProfileName profileName;
+
+    public Consumer(Socket connection) {
+        this.requestSocket = connection;
+    }
 
     public void init(int port) {
         try {
@@ -198,6 +204,7 @@ public class Consumer implements Node {
                 }
             }
 
+
             keyboard = new BufferedReader(new InputStreamReader(System.in));
             input = new InputStreamReader(requestSocket.getInputStream());
             out = new BufferedReader(input);
@@ -250,6 +257,7 @@ public class Consumer implements Node {
             e.printStackTrace();
         }
     }
+
 
     public void disconnect(Broker broker, Group groupName) {} //Disconnects from the group
 
